@@ -9,19 +9,20 @@ namespace SemestralProject
         private static User User;
         static void Main(string[] args)
         {
+            // Inicializace databáze
             InitializeDatabase();
             bool loggedIn = false;
 
-            // Loop until the user logs in successfully
+            // Smyčka dokud uživatel úspěšně nepřihlásí
             while (!loggedIn)
             {
-                Console.WriteLine("Send 1 to login or 2 if you want to register");
+                Console.WriteLine("Pošlete 1 pro přihlášení nebo 2 pokud chcete registrovat");
                 string input = Console.ReadLine();
                 int choice;
 
                 if (!int.TryParse(input, out choice))
                 {
-                    Console.WriteLine("Invalid input. Please enter 1 or 2.");
+                    Console.WriteLine("Neplatný vstup. Zadejte prosím 1 nebo 2.");
                     continue;
                 }
 
@@ -34,7 +35,7 @@ namespace SemestralProject
                         loggedIn = UserRegister();
                         break;
                     default:
-                        Console.WriteLine("Invalid choice. Please enter 1 or 2.");
+                        Console.WriteLine("Neplatná volba. Zadejte prosím 1 nebo 2.");
                         break;
                 }
             }
@@ -43,27 +44,29 @@ namespace SemestralProject
 
         static void InitializeDatabase()
         {
+            // Inicializace kontextu databáze
             dbContext = new ProjectDbContext();
 
+            // Zajištění vytvoření databáze (pokud neexistuje)
             dbContext.Database.EnsureCreated();
         }
 
         static bool UserLogin()
         {
-            Console.WriteLine("Enter a username");
+            Console.WriteLine("Zadejte uživatelské jméno");
             string username = Console.ReadLine();
             var user = dbContext.Users.FirstOrDefault(u => u.UserName == username);
-            if(user == null)
+            if (user == null)
             {
-                Console.WriteLine("User doesn't exist. Press any key to return to the main menu...");
+                Console.WriteLine("Uživatel neexistuje. Stiskněte libovolnou klávesu pro návrat do hlavního menu...");
                 Console.ReadKey();
                 return false;
             }
             User = user;
 
-            if(CheckUserPassword())
+            if (CheckUserPassword())
             {
-                return true;   
+                return true;
             }
             return true;
         }
@@ -72,25 +75,25 @@ namespace SemestralProject
         {
             while (true)
             {
-                Console.WriteLine("Enter your password:");
+                Console.WriteLine("Zadejte heslo:");
                 string enteredPassword = Console.ReadLine();
 
                 if (User.Password != enteredPassword)
                 {
-                    Console.WriteLine("Wrong password. Please try again.");
+                    Console.WriteLine("Nesprávné heslo. Zkuste to znovu.");
                 }
                 else
                 {
-                    return true; // Password is correct, return true and exit the loop
+                    return true; // Heslo je správné, vrátí true a ukončí smyčku
                 }
             }
         }
 
         static bool UserRegister()
         {
-            Console.WriteLine("Enter a username");
+            Console.WriteLine("Zadejte uživatelské jméno");
             string username = Console.ReadLine();
-            Console.WriteLine("Enter a password");
+            Console.WriteLine("Zadejte heslo");
             string password = Console.ReadLine();
 
             User user = new User
@@ -107,14 +110,14 @@ namespace SemestralProject
         {
             while (true)
             {
-                Console.WriteLine("Send 1 to list all the tasks or 2 if you want to create one");
+                Console.WriteLine("Pošlete 1 pro výpis všech úkolů nebo 2 pokud chcete vytvořit nový");
                 string input = Console.ReadLine();
                 int choice;
 
                 if (!int.TryParse(input, out choice))
                 {
-                    Console.WriteLine("Invalid input. Please enter 1 or 2.");
-                    continue; // Restart the loop to prompt the user again
+                    Console.WriteLine("Neplatný vstup. Zadejte prosím 1 nebo 2.");
+                    continue; // Restartovat smyčku pro znovu vyzvání uživatele
                 }
 
                 if (choice == 1)
@@ -123,28 +126,28 @@ namespace SemestralProject
                     {
                         foreach (var task in User.Tasks)
                         {
-                            Console.WriteLine($"Task Title: {task.Title}, Task Description: {task.Description}");
+                            Console.WriteLine($"Název úkolu: {task.Title}, Popis úkolu: {task.Description}");
                         }
                     }
                     else
                     {
-                        // Either User is null, User.Tasks is null, or User has no tasks
-                        Console.WriteLine("You don't have any tasks.");
+                        // Buď je User null, User.Tasks je null nebo User nemá žádné úkoly
+                        Console.WriteLine("Nemáte žádné úkoly.");
                     }
-                    continue; // Exit the loop since a valid choice was made
+                    continue; // Ukončit smyčku, protože byla provedena platná volba
                 }
                 else if (choice == 2)
                 {
-                    Console.WriteLine("Title of the task");
+                    Console.WriteLine("Název úkolu");
                     string title = Console.ReadLine();
-                    Console.WriteLine("Description of the task");
+                    Console.WriteLine("Popis úkolu");
                     string description = Console.ReadLine();
 
                     UserTask newTask = new UserTask
                     {
                         Title = title,
                         Description = description,
-                        UserId = User.Id // Assuming UserId needs to be set for the relationship
+                        UserId = User.Id // Předpokládá se, že UserId musí být nastaveno pro vztah
                     };
 
                     if (User.Tasks == null)
@@ -154,15 +157,15 @@ namespace SemestralProject
 
                     User.Tasks.Add(newTask);
 
-                    // Save changes to the database
+                    // Uložení změn do databáze
                     dbContext.SaveChanges();
 
-                    continue; // Exit the loop since a valid choice was made
+                    continue; // Ukončit smyčku, protože byla provedena platná volba
                 }
                 else
                 {
-                    Console.WriteLine("Invalid choice. Please enter 1 or 2.");
-                    // The loop will continue and prompt the user again
+                    Console.WriteLine("Neplatná volba. Zadejte prosím 1 nebo 2.");
+                    // Smyčka pokračuje a znovu vyzve uživatele
                 }
             }
         }

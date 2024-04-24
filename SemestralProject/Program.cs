@@ -55,7 +55,7 @@ namespace SemestralProject
         {
             Console.WriteLine("Zadejte uživatelské jméno");
             string username = Console.ReadLine();
-            var user = dbContext.Users.FirstOrDefault(u => u.UserName == username);
+            var user = dbContext.Users.Include(u => u.Tasks).FirstOrDefault(u => u.UserName == username);
             if (user == null)
             {
                 Console.WriteLine("Uživatel neexistuje. Stiskněte libovolnou klávesu pro návrat do hlavního menu...");
@@ -93,6 +93,14 @@ namespace SemestralProject
         {
             Console.WriteLine("Zadejte uživatelské jméno");
             string username = Console.ReadLine();
+            // Kontrola, zda uživatel již existuje v databázi
+            var existingUser = dbContext.Users.FirstOrDefault(u => u.UserName == username);
+            if (existingUser != null)
+            {
+                Console.WriteLine("Uživatel již existuje.");
+                return false; // Vrátit false pro indikaci neúspěchu registrace
+            }
+
             Console.WriteLine("Zadejte heslo");
             string password = Console.ReadLine();
 
